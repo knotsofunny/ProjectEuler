@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 answer = -1 # Needed because 1^5 isnt a sum
 
-#only go up to 3 for reasons
+#only go up to 300,000 because math
 for a in range(0,3): #Ever put a loop
     for b in range(0,10): #in a loop
         for c in range(0,10): #in a loop
@@ -12,5 +12,7 @@ for a in range(0,3): #Ever put a loop
                             power = pow(a,5) + pow(b,5) + pow(c,5) + pow(d,5) + pow(e,5) + pow(f,5)
                             if num == power:
                                 answer += num
+                                print(num)
 
+#Print answer with no newline to work with check script
 print(answer, end='')
