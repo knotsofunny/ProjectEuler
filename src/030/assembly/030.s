@@ -25,7 +25,7 @@ _loop:
 _gotNumber:                 ; Resume loop after getting number
     
 
-    cmp rbx,200000          ; Stop after 300,000
+    cmp rbx,300000          ; Stop after 300,000
     ja _exit
 
     push rbx                ; Store number on the stack
