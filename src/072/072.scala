@@ -23,43 +23,16 @@ def sortSieve(limit: Int): (List[Int], List[Int]) = {
   (primeNums.toList.distinct diff List(0,1), compNums.toList.distinct diff List(0,1))
 }
 
-/*
-def compSieve(limit: Int, factors: List[Int]): Int = {
-  var nums: Array[Int] = range(0, limit)
-
-  for(factor <- factors){
-    var i = factor
-    while(i < limit){
-      nums(i) = 0
-      i += factor
-    }
-  } 
-  var sum = 0
-  (nums.toList.distinct diff List(0)).foreach(i => sum += 1)
-  sum
-}
-*/
-//Returns the number of all numbers under a limit that are not
-//mulitples of any prime factors of that limit
-
-
-//TODO: subtracting factors to0 many times
-//ex: If factors are (2,3) 6 gets counted twice
-def nonFactors(limit: Int, factors: List[Int]): Int = {
-  var count: Int = limit + (factors.length - 1)
-  factors.foreach(i => count -= limit / i)
-  count
-}
 
 def factors(max: Int): List[Int] = {
-  var list = Array.fill[Int](10)(0)//Ten unique prime factors allows up to 6.45 billion
+  var factor = Array.fill[Int](10)(0)//Ten unique prime factors allows up to 6.45 billion
   var num = max
   var i = 2
   var count = 1
   while(i <= num){
     if(num % i == 0){
-      if(list(count - 1) != i){
-        list(count) = i
+      if(factor(count - 1) != i){
+        factor(count) = i
         count += 1
       }
     
@@ -69,17 +42,91 @@ def factors(max: Int): List[Int] = {
       i += 1 
     }
   }
-  list.toList.distinct.sorted diff List(0)
+  factor.toList.distinct diff List(0)
 }
 
-val sortedNums = sortSieve(13)
+def factor2(limit: Int): Int = {
+  var prev = 2
+  var num = limit
+  var i = 2
+  var count = 1
+  var powerCount = 1
+  var sum = 1
+  while(i <= num){
+    if(num % i == 0){
+      if(i == prev){
+        powerCount += 1 
+      } else {
+        sum *= powerCount
+        powerCount = 1
+        prev = i
+      }
+      num /= i
+      i = 2
+    } else {
+      i += 1 
+    }
+  }
+  limit - sum
+}
+
+//Returns the number of all numbers under a limit that are not
+//mulitples of any prime factors of that limit
+def nonFactors(num: Int, factors: List[Int]): Int = {
+  var mul = List[Int]()
+  for(i <- factors){
+    var a = Array.fill[Int](num/i)(0)
+    for(j <- 1 to num / i){
+      a(j - 1) = i * j
+    }
+    mul = a.toList ::: mul
+  }
+  num - mul.distinct.length
+}
+val max = 40000
+val sortedNums = sortSieve(max)
 val primes = sortedNums._1
 val comps = sortedNums._2
-
+var d = scala.collection.mutable.Map[Int, Int]();
 var sum: Long = 0
 
 primes.foreach(i => sum += i - 1)
+
+for(i <- comps){
+  if(i % 2 == 0){
+    if(d.contains(i)){
+      sum += d(i)
+    } else {
+      val num = nonFactors(i, factors(i))
+      sum += num
+      var mul = 2
+      while(i * mul <= max){
+        d += (i*mul -> num*mul)
+        mul *= 2
+      }
+    }
+  }else{
+    if(d.contains(i)){
+      sum += d(i)
+    } else {
+      val num = nonFactors(i, factors(i))
+      sum += num
+      var mul = 3
+      while(i * mul <= max){
+        d += (i*mul -> num * mul)
+        mul *= 3
+      }
+    }
+  }
+}
+
+println(sum)
+
+/*
 comps.foreach{i => sum += nonFactors(i, factors(i))
               println("Composites: " + i)
              }
 println(sum)
+*/
+
+
