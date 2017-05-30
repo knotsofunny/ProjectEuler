@@ -45,88 +45,23 @@ def factors(max: Int): List[Int] = {
   factor.toList.distinct diff List(0)
 }
 
-def factor2(limit: Int): Int = {
-  var prev = 2
-  var num = limit
-  var i = 2
-  var count = 1
-  var powerCount = 1
-  var sum = 1
-  while(i <= num){
-    if(num % i == 0){
-      if(i == prev){
-        powerCount += 1 
-      } else {
-        sum *= powerCount
-        powerCount = 1
-        prev = i
-      }
-      num /= i
-      i = 2
-    } else {
-      i += 1 
-    }
+def phi(num: Int, factors: List[Int]): Int = {
+  var ans = num.toDouble
+  factors.foreach{i => ans *= (1 - 1/i.toDouble)
   }
-  limit - sum
+
+  ans.toInt
 }
 
-//Returns the number of all numbers under a limit that are not
-//mulitples of any prime factors of that limit
-def nonFactors(num: Int, factors: List[Int]): Int = {
-  var mul = List[Int]()
-  for(i <- factors){
-    var a = Array.fill[Int](num/i)(0)
-    for(j <- 1 to num / i){
-      a(j - 1) = i * j
-    }
-    mul = a.toList ::: mul
-  }
-  num - mul.distinct.length
-}
-val max = 40000
+val max = 1000000
 val sortedNums = sortSieve(max)
 val primes = sortedNums._1
 val comps = sortedNums._2
-var d = scala.collection.mutable.Map[Int, Int]();
 var sum: Long = 0
 
 primes.foreach(i => sum += i - 1)
 
-for(i <- comps){
-  if(i % 2 == 0){
-    if(d.contains(i)){
-      sum += d(i)
-    } else {
-      val num = nonFactors(i, factors(i))
-      sum += num
-      var mul = 2
-      while(i * mul <= max){
-        d += (i*mul -> num*mul)
-        mul *= 2
-      }
-    }
-  }else{
-    if(d.contains(i)){
-      sum += d(i)
-    } else {
-      val num = nonFactors(i, factors(i))
-      sum += num
-      var mul = 3
-      while(i * mul <= max){
-        d += (i*mul -> num * mul)
-        mul *= 3
-      }
-    }
-  }
-}
+comps.foreach{i => sum += phi(i, factors(i))}
 
 println(sum)
-
-/*
-comps.foreach{i => sum += nonFactors(i, factors(i))
-              println("Composites: " + i)
-             }
-println(sum)
-*/
-
 
