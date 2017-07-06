@@ -3,7 +3,9 @@ A text version of Project Euler with answers encrypted by md5.
 Includes a script to check if answer is correct.
 
 Run by piping answer to checking script.
-ex:   ./001 | ./check
+
+ex:   ./bin/001 | ./check
+
 echo 123456 | ./check
 
 
